@@ -14,5 +14,10 @@ $('#message-form').on('submit', function(e) {
 })
 
 socket.on('message', (message)=> {
-    console.log(message)
+    
+    iziToast.success({
+        title: 'OK',
+        message: message,
+    });
+
 })

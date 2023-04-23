@@ -130,9 +130,11 @@ io.on('connection', (socket) => {
 
     console.log('A new socket has connected')
 
+    socket.join('chat')
+
     socket.on('sendMessage', (message, callback) => {
 
-        io.emit('message', message)
+        io.to('chat').emit('message', message)
         callback()
 
     })

@@ -3,23 +3,25 @@ const socket = io()
 const userName = document.querySelector('#user-name').value
 const room = document.querySelector('#room-name').value
 
+console.log(room)
+
 $('#message-form').on('submit', function(e) {
 
     e.preventDefault()
 
-    const message = document.querySelector('#message')
-    socket.emit('sendMessage', message.value, userName, () => {
+    const message = document.querySelector('#message').value
+    socket.emit('sendMessage', message, userName, room, () => {
 
         console.log('Message has been sent successfuly!')
-        message.value = ''
+        document.querySelector('#message').value = ''
 
     })
 })
 
-socket.on('message', (message)=> {
+socket.on('message', (message, userName)=> {
     
     iziToast.success({
-        title: 'OK',
+        title: userName,
         message: message,
     });
 

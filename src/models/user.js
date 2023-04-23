@@ -4,6 +4,7 @@ const Group = require('./group')
 const GroupMember = require('./groupMember')
 const Friendship = require('./friendship')
 const Message = require('./message')
+const Room = require('./room')
 
 const User = sequelize.define('User', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -18,6 +19,8 @@ Group.belongsToMany(User, { through: GroupMember, as: 'members' });
 Message.belongsTo(User, { as: 'sender' });
 Message.belongsTo(User, { as: 'receiver' });
 Message.belongsTo(Group);
+Room.belongsTo(User, { as: 'user_1' })
+Room.belongsTo(User, { as: 'user_2' })
 
 // sequelize.sync()
 

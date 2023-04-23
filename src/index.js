@@ -9,8 +9,10 @@ const bcrypt = require('bcrypt')
 const socketio = require('socket.io')
 require('dotenv').config();
 const auth = require('./middlewares/auth')
+const { Op } = require('sequelize');
 
 const User = require('./models/user')
+const Room = require('./models/room')
 
 const app = express()
 
@@ -126,9 +128,21 @@ app.get('/chat', auth, (req,res) => {
 
 })
 
-app.get('/chat/:id', auth, (req,res) => {
+app.get('/chat/:id', auth, async(req,res) => {
 
-    res.render('views/chat', {user: req.user, room: req.params.id})
+    const user = req.user
+    const room = await Room.findOne({
+        where: {
+            id: req.params.id,
+            [Op.or]: [{ user1Id: user.id }, { user2Id: user.id }]
+        }
+    })
+    
+    if (!room) {
+        return res.send('This room does not exist or you are not authorized to access it.');
+      }
+
+    res.render('views/chat', { user, room });
 
 })
 
@@ -145,11 +159,10 @@ io.on('connection', (socket) => {
 
     })
 
-    socket.on('sendMessage', (message, callback) => {
+    socket.on('sendMessage', (message, username , room, callback) => {
 
-        io.to('chat').emit('message', message)
+        io.to(room).emit('message', message, username)
         callback()
-
     })
 
     socket.on('disconnect', () => {

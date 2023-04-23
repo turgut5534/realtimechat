@@ -15,7 +15,10 @@
         <div class="row justify-content-center w-100">
             <div class="col-10">
                 <form  id="message-form">
-                    
+
+                    <input type="hidden" id="user-name" value="<%= user.name %>">
+                    <input type="hidden" id="room-name" value="<%= room %>">
+
                     <div class="mb-3">
                         <input id="message" class="form-control" type="text" placeholder="Your message">
                     </div>
@@ -23,7 +26,6 @@
                     <div class="mb-3 text-center">
                         <button class="btn btn-primary">Send</button>
                     </div>
-
                 </form>
             </div>
         </div>

@@ -122,15 +122,28 @@ app.get('/me', auth, (req,res) => {
 
 app.get('/chat', auth, (req,res) => {
 
-    res.render('views/chat')
+    res.render('views/chat', {user: req.user})
 
 })
+
+app.get('/chat/:id', auth, (req,res) => {
+
+    res.render('views/chat', {user: req.user, room: req.params.id})
+
+})
+
 
 io.on('connection', (socket) => {
 
     console.log('A new socket has connected')
 
-    socket.join('chat')
+    socket.on('join', (userName, room) => {
+        
+        socket.join(room)
+
+        socket.broadcast.to(room).emit('message', `${userName} has joined the room`)
+
+    })
 
     socket.on('sendMessage', (message, callback) => {
 

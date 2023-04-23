@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const bcrypt = require('bcrypt')
+const socketio = require('socket.io')
 require('dotenv').config();
 const auth = require('./middlewares/auth')
 
@@ -25,6 +26,7 @@ app.set('view engine', 'ejs')
 app.set('views', viewsDirectory)
 
 const server = http.createServer(app)
+const io = socketio(server)
 
 app.get('/login', (req,res) => {
 
@@ -116,6 +118,29 @@ app.get('/logout', (req, res) => {
 app.get('/me', auth, (req,res) => {
     
     res.send(req.user)
+})
+
+app.get('/chat', auth, (req,res) => {
+
+    res.render('views/chat')
+
+})
+
+io.on('connection', (socket) => {
+
+    console.log('A new socket has connected')
+
+    socket.on('sendMessage', (message, callback) => {
+
+        io.emit('message', message)
+        callback()
+
+    })
+
+    socket.on('disconnect', () => {
+        console.log('A user has left')
+    })
+
 })
 
 server.listen(port, () => {

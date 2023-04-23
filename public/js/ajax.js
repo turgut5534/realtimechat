@@ -59,7 +59,7 @@ $('.login-form').on('submit', function(e) {
             $('.login-form')[0].reset(); 
 
             setTimeout(() => {
-                location.href = '/login'
+                location.href = '/chat'
             }, 1000);
 
         },

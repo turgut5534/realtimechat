@@ -11,8 +11,11 @@ require('dotenv').config();
 const auth = require('./middlewares/auth')
 const { Op } = require('sequelize');
 
-const User = require('./models/user')
-const Room = require('./models/room')
+const User = require('./models/User')
+const Room = require('./models/Room')
+// const Message = require('./models/Message')
+const Friend = require('./models/Friend')
+// const RoomMember = require('./models/RoomMember')
 
 const app = express()
 
@@ -29,6 +32,27 @@ app.set('views', viewsDirectory)
 
 const server = http.createServer(app)
 const io = socketio(server)
+
+app.get('/', auth, async(req,res) => {
+
+    try {
+
+        const user = await User.findOne({
+            where: {
+              id: req.user.id
+            },
+            include: [
+              { model: Friend, include: [{ model: User}] }
+            ]
+          });
+
+        res.render('views/friends', {user})
+        
+    } catch(e) {
+        console.log(e)
+    }
+
+})
 
 app.get('/login', (req,res) => {
 
@@ -97,12 +121,35 @@ app.post('/register', async(req,res) => {
         }
 
         await User.create({
-            name: name,
+            username: name,
             email: email,
             password: await bcrypt.hash(password, 10)
         })
         
         return res.status(201).json({status: true, message: "You have been registered successfully!"})
+
+    } catch(e) {
+        console.log(e)
+    }
+
+})
+
+app.get('/', auth,  async(req,res) => {
+
+    try {
+
+        const user = await User.findOne({
+            where: {
+                id: req.user.id
+            },
+            include: [{
+                model: User,
+                as: 'friends',
+                through: { attributes: [] }
+            }]
+        })
+
+        res.render('views/friends', {user})
 
     } catch(e) {
         console.log(e)

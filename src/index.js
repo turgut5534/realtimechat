@@ -18,7 +18,7 @@ const viewsDirectory = path.join(__dirname, '../templates')
 
 app.use(express.json())
 app.use(express.static(publicDirectory))
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}))
 app.use(cookieParser())
 
 app.set('view engine', 'ejs')
@@ -37,6 +37,10 @@ app.post('/login', async(req,res) => {
     try {
 
         const { email, password } = req.body
+
+        if(!email || !password) {
+            return res.status(400).json({status:false, message: 'Please fill the fields'})
+        }
 
         const user = await User.findOne( {where: { email:email } })
 
